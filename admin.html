@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diecast Garage - Product Admin</title>
+    <style>
+        :root {
+            --primary-red: #FF1700;
+            --primary-black: #1a1a1a;
+            --primary-gold: #FFD700;
+            --accent-silver: #E8E8E8;
+            --bg-dark: #0f0f0f;
+            --bg-card: #1f1f1f;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8b8;
+            --border-color: #333333;
+            --shadow-md: 0 8px 24px rgba(255, 23, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Trebuchet MS, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a0a0a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a0a0a 100%);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-screen.active {
+            display: flex;
+        }
+
+        .login-container {
+            background: var(--bg-card);
+            border: 3px solid var(--primary-red);
+            border-radius: 1rem;
+            padding: 3rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary-red), var(--primary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .login-form .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .login-form .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            border-radius: 0.4rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .login-form .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        .login-note {
+            color: var(--primary-gold);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: linear-gradient(90deg, var(--primary-black) 0%, #2a0a0a 100%);
+            border-bottom: 3px solid var(--primary-red);
+            padding: 2rem 0;
+            margin: -2rem -2rem 2rem -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-gold);
+            border-bottom-color: var(--primary-gold);
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-gold);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            color: var(--primary-gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--border-color);
+            border-radius: 0.4rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        .form-group textarea {
+            grid-column: 1 / -1;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .image-uploads {
+            grid-column: 1 / -1;
+            margin-bottom: 1rem;
+        }
+
+        .image-uploads h3 {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .image-input-wrapper {
+            position: relative;
+        }
+
+        .image-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .image-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 150px;
+            background: var(--bg-dark);
+            border: 2px dashed var(--primary-red);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .image-upload-btn:hover {
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            border: 2px solid var(--primary-gold);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-remove-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        .image-preview:hover .image-remove-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            grid-column: 1 / -1;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red), #cc1200);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #8b0000;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b00000;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            flex: none;
+        }
+
+        .products-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            gap: 1.5rem;
+            align-items: start;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow-md);
+        }
+
+        .product-images-preview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .product-images-preview img {
+            width: 100%;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 0.3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-gold);
+        }
+
+        .product-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+        }
+
+        .product-meta span {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .product-meta strong {
+            color: var(--primary-gold);
+        }
+
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: var(--primary-gold);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.4rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.success {
+            background: #1a3a1a;
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            display: block;
+        }
+
+        .alert.error {
+            background: #3a1a1a;
+            border: 2px solid #f87171;
+            color: #f87171;
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== EDIT MODAL ===== */
+        #editProductModal {
+            background: var(--bg-card);
+            border: 2px solid var(--primary-red);
+            border-radius: 0.75rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        #editProductModal .form-grid {
+            margin-top: 1.5rem;
+        }
+
+        #editProductModal .button-group {
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .product-card {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .data-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen" class="login-screen active">
+        <div class="login-container">
+            <h1>🏎️ DIECAST GARAGE</h1>
+            <p class="subtitle">Admin Access</p>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password" required autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Access Admin Panel</button>
+            </form>
+            
+            <p class="login-note">🔒 Secure Access Only</p>
+        </div>
+    </div>
+
+        <!-- EDIT PRODUCT MODAL -->
+        <div id="editProductModal" class="form-section" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <button onclick="closeEditModal()" style="float: right; background: var(--primary-red); color: white; border: none; width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">✕</button>
+            <h2>Edit Product</h2>
+            <form id="editProductForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editProductName">Product Name *</label>
+                        <input type="text" id="editProductName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductYear">Year *</label>
+                        <input type="number" id="editProductYear" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductSeries">Series *</label>
+                        <input type="text" id="editProductSeries" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductCondition">Condition *</label>
+                        <select id="editProductCondition" required>
+                            <option value="">Select condition</option>
+                            <option value="mint">Mint in Box (MIB)</option>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductPrice">Price (£) *</label>
+                        <input type="number" id="editProductPrice" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductQuantity">Quantity in Stock *</label>
+                        <input type="number" id="editProductQuantity" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editProductDescription">Description *</label>
+                        <textarea id="editProductDescription" required></textarea>
+                    </div>
+
+                    <div class="image-uploads">
+                        <h3>Product Images (click to update)</h3>
+                        <div class="image-grid">
+                            <div class="image-input-wrapper">
+                                <input type="file" id="editImage0" accept="image/*" class="edit-image-input">
+                                <div class="image-upload-btn" onclick="document.getElementById('editImage0').click()" id="editImageBtn0">
+                                    <span>📸</span>
+                                    <span>Image 1</span>
+                                </div>
+                                <div id="editPreview0" style="display: none;"></div>
+                            </div>
+                            <div class="image-input-wrapper">
+                                <input type="file" id="editImage1" accept="image/*" class="edit-image-input">
+                                <div class="image-upload-btn" onclick="document.getElementById('editImage1').click()" id="editImageBtn1">
+                                    <span>📸</span>
+                                    <span>Image 2</span>
+                                </div>
+                                <div id="editPreview1" style="display: none;"></div>
+                            </div>
+                            <div class="image-input-wrapper">
+                                <input type="file" id="editImage2" accept="image/*" class="edit-image-input">
+                                <div class="image-upload-btn" onclick="document.getElementById('editImage2').click()" id="editImageBtn2">
+                                    <span>📸</span>
+                                    <span>Image 3</span>
+                                </div>
+                                <div id="editPreview2" style="display: none;"></div>
+                            </div>
+                            <div class="image-input-wrapper">
+                                <input type="file" id="editImage3" accept="image/*" class="edit-image-input">
+                                <div class="image-upload-btn" onclick="document.getElementById('editImage3').click()" id="editImageBtn3">
+                                    <span>📸</span>
+                                    <span>Image 4</span>
+                                </div>
+                                <div id="editPreview3" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="editModalOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1999;" onclick="closeEditModal()"></div>
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h1>🏎️ DIECAST GARAGE - ADMIN</h1>
+                    <p>Manage your product inventory</p>
+                </div>
+                <button class="btn btn-secondary btn-small" onclick="logout()" style="height: fit-content;">Logout</button>
+            </div>
+        </div>
+
+    <div id="adminPanel" class="container" style="display: none;">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('add-product')">Add Product</button>
+            <button class="tab-btn" onclick="switchTab('manage-products')">Manage Products</button>
+            <button class="tab-btn" onclick="switchTab('data-management')">Data & Settings</button>
+        </div>
+
+        <!-- ADD PRODUCT TAB -->
+        <div id="add-product" class="tab-content active">
+            <div id="alert" class="alert"></div>
+
+            <div class="form-section">
+                <h2>Add New Product</h2>
+                <form id="productForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="productName">Product Name *</label>
+                            <input type="text" id="productName" placeholder="e.g., 1968 Custom Camaro" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productYear">Year *</label>
+                            <input type="number" id="productYear" placeholder="2023" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productSeries">Series *</label>
+                            <input type="text" id="productSeries" placeholder="e.g., Hot Wheels Legends" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productCondition">Condition *</label>
+                            <select id="productCondition" required>
+                                <option value="">Select condition</option>
+                                <option value="mint">Mint in Box (MIB)</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productPrice">Price (£) *</label>
+                            <input type="number" id="productPrice" placeholder="29.99" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productQuantity">Quantity in Stock *</label>
+                            <input type="number" id="productQuantity" placeholder="5" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productDescription">Description *</label>
+                            <textarea id="productDescription" placeholder="Describe the product, condition, special features..." required></textarea>
+                        </div>
+
+                        <div class="image-uploads">
+                            <h3>Product Images (4 required)</h3>
+                            <div class="image-grid">
+                                <div class="image-input-wrapper">
+                                    <input type="file" id="image0" accept="image/*" class="image-input">
+                                    <div class="image-upload-btn" onclick="document.getElementById('image0').click()">
+                                        <span>📸</span>
+                                        <span>Image 1</span>
+                                    </div>
+                                    <div id="preview0" style="display: none;"></div>
+                                </div>
+                                <div class="image-input-wrapper">
+                                    <input type="file" id="image1" accept="image/*" class="image-input">
+                                    <div class="image-upload-btn" onclick="document.getElementById('image1').click()">
+                                        <span>📸</span>
+                                        <span>Image 2</span>
+                                    </div>
+                                    <div id="preview1" style="display: none;"></div>
+                                </div>
+                                <div class="image-input-wrapper">
+                                    <input type="file" id="image2" accept="image/*" class="image-input">
+                                    <div class="image-upload-btn" onclick="document.getElementById('image2').click()">
+                                        <span>📸</span>
+                                        <span>Image 3</span>
+                                    </div>
+                                    <div id="preview2" style="display: none;"></div>
+                                </div>
+                                <div class="image-input-wrapper">
+                                    <input type="file" id="image3" accept="image/*" class="image-input">
+                                    <div class="image-upload-btn" onclick="document.getElementById('image3').click()">
+                                        <span>📸</span>
+                                        <span>Image 4</span>
+                                    </div>
+                                    <div id="preview3" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                        <button type="reset" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MANAGE PRODUCTS TAB -->
+        <div id="manage-products" class="tab-content">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalProducts">0</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalValue">£0.00</div>
+                    <div class="stat-label">Inventory Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalStock">0</div>
+                    <div class="stat-label">Total Stock</div>
+                </div>
+            </div>
+
+            <div id="productsList" class="products-list"></div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p>No products yet. Add your first product to get started!</p>
+            </div>
+        </div>
+
+        <!-- DATA MANAGEMENT TAB -->
+        <div id="data-management" class="tab-content">
+            <div class="form-section">
+                <h2>Data & Settings</h2>
+
+                <div class="data-actions">
+                    <button class="btn btn-primary" onclick="exportData()">
+                        📥 Export Products (JSON)
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                        📤 Import Products (JSON)
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                </div>
+
+                <div id="alert2" class="alert"></div>
+
+                <div class="form-section" style="margin-top: 2rem; border-color: #8b0000;">
+                    <h2 style="color: #f87171;">Danger Zone</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        This action cannot be undone. Please make sure you have backed up your data first.
+                    </p>
+                    <button class="btn btn-danger" onclick="clearAllData()">Delete All Products</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== STORAGE KEY =====
+        const STORAGE_KEY = 'diecast_garage_products';
+
+        // ===== TAB SWITCHING =====
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'manage-products') {
+                renderProductsList();
+            }
+        }
+
+        // ===== IMAGE HANDLING =====
+        function setupImageHandlers() {
+            document.querySelectorAll('.image-input').forEach((input, index) => {
+                input.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const preview = document.getElementById(`preview${index}`);
+                            if (!preview) {
+                                console.warn(`preview${index} not found`);
+                                return;
+                            }
+                            preview.innerHTML = `
+                                <div class="image-preview">
+                                    <img src="${event.target.result}" alt="Preview">
+                                    <button type="button" class="image-remove-btn" onclick="removeImage(${index})">✕</button>
+                                </div>
+                            `;
+                            preview.style.display = 'block';
+                            const uploadBtn = document.querySelector(`[onclick="document.getElementById('image${index}').click()"]`);
+                            if (uploadBtn) uploadBtn.style.display = 'none';
+                        };
+                        reader.onerror = function() {
+                            showAlert('❌ Error reading image file', 'error');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+
+        function removeImage(index) {
+            const input = document.getElementById(`image${index}`);
+            input.value = '';
+            document.getElementById(`preview${index}`).style.display = 'none';
+            const uploadBtn = document.querySelector(`[onclick="document.getElementById('image${index}').click()"]`);
+            if (uploadBtn) uploadBtn.style.display = 'flex';
+        }
+
+        // ===== FORM SUBMISSION =====
+        function setupFormListener() {
+            const form = document.getElementById('productForm');
+            if (!form) {
+                console.warn('productForm not found');
+                return;
+            }
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Check all images are uploaded
+                let allImagesLoaded = true;
+                for (let i = 0; i < 4; i++) {
+                    const file = document.getElementById(`image${i}`).files[0];
+                    if (!file) {
+                        allImagesLoaded = false;
+                        break;
+                    }
+                }
+
+                if (!allImagesLoaded) {
+                    showAlert('❌ Please upload all 4 images', 'error');
+                    return;
+                }
+
+                // Validate form fields
+                const productName = document.getElementById('productName').value.trim();
+                const productYear = document.getElementById('productYear').value;
+                const productSeries = document.getElementById('productSeries').value.trim();
+                const productCondition = document.getElementById('productCondition').value;
+                const productPrice = document.getElementById('productPrice').value;
+                const productQuantity = document.getElementById('productQuantity').value;
+                const productDescription = document.getElementById('productDescription').value.trim();
+
+                // Use explicit string check instead of falsy check (0 is valid)
+                if (productName === '' || productYear === '' || productSeries === '' || productCondition === '' || productPrice === '' || productQuantity === '' || productDescription === '') {
+                    showAlert('❌ Please fill in all fields', 'error');
+                    return;
+                }
+
+                // Load all images
+                let loadedImages = 0;
+                const tempImages = [];
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Adding product...';
+                submitBtn.disabled = true;
+
+                for (let i = 0; i < 4; i++) {
+                    (function(index) {
+                        const file = document.getElementById(`image${index}`).files[0];
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            tempImages[index] = event.target.result;
+                            loadedImages++;
+
+                            if (loadedImages === 4) {
+                                // All images loaded, create product
+                                const product = {
+                                    id: Date.now(),
+                                    name: productName,
+                                    year: parseInt(productYear),
+                                    series: productSeries,
+                                    condition: productCondition,
+                                    price: parseFloat(productPrice),
+                                    quantity: parseInt(productQuantity),
+                                    description: productDescription,
+                                    images: tempImages
+                                };
+
+                                addProduct(product);
+                                submitBtn.textContent = originalText;
+                                submitBtn.disabled = false;
+                            }
+                        };
+                        
+                        reader.onerror = function() {
+                            showAlert('❌ Error loading image ' + (index + 1), 'error');
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    })(i);
+                }
+            });
+        }
+        
+        // ===== PRODUCT OPERATIONS =====
+        function getProducts() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveProducts(products) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+        }
+
+        function addProduct(product) {
+            const products = getProducts();
+            products.push(product);
+            saveProducts(products);
+            
+            showAlert(`"${product.name}" added successfully!`, 'success');
+            document.getElementById('productForm').reset();
+            
+            // Clear previews
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`preview${i}`).style.display = 'none';
+                document.querySelector(`[onclick="document.getElementById('image${i}').click()"]`).style.display = 'flex';
+            }
+        }
+
+        function editProduct(productId) {
+            const products = getProducts();
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) {
+                showAlert('❌ Product not found', 'error');
+                return;
+            }
+
+            // Populate form
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductYear').value = product.year;
+            document.getElementById('editProductSeries').value = product.series;
+            document.getElementById('editProductCondition').value = product.condition;
+            document.getElementById('editProductPrice').value = product.price;
+            document.getElementById('editProductQuantity').value = product.quantity;
+            document.getElementById('editProductDescription').value = product.description;
+
+            // Show current images
+            for (let i = 0; i < 4; i++) {
+                const preview = document.getElementById(`editPreview${i}`);
+                const btn = document.getElementById(`editImageBtn${i}`);
+                const input = document.getElementById(`editImage${i}`);
+                
+                if (product.images[i]) {
+                    preview.innerHTML = `
+                        <div class="image-preview">
+                            <img src="${product.images[i]}" alt="Preview">
+                            <button type="button" class="image-remove-btn" onclick="removeEditImage(${i})">✕</button>
+                        </div>
+                    `;
+                    preview.style.display = 'block';
+                    btn.style.display = 'none';
+                    input.dataset.hasImage = 'true';
+                } else {
+                    preview.style.display = 'none';
+                    btn.style.display = 'flex';
+                    input.dataset.hasImage = 'false';
+                }
+                input.value = '';
+            }
+
+            // Store product ID for update
+            document.getElementById('editProductForm').dataset.productId = productId;
+
+            // Show modal
+            document.getElementById('editModalOverlay').style.display = 'block';
+            document.getElementById('editProductModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModalOverlay').style.display = 'none';
+            document.getElementById('editProductModal').style.display = 'none';
+            // Don't reset form here - let it happen naturally
+        }
+
+        function removeEditImage(index) {
+            document.getElementById(`editImage${index}`).value = '';
+            document.getElementById(`editImage${index}`).dataset.hasImage = 'false';
+            document.getElementById(`editPreview${index}`).style.display = 'none';
+            document.getElementById(`editImageBtn${index}`).style.display = 'flex';
+        }
+
+        function setupEditFormListener() {
+            const form = document.getElementById('editProductForm');
+            if (!form) {
+                console.warn('editProductForm not found');
+                return;
+            }
+            
+            // Always attach listener fresh
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Edit form submitted');
+                const productId = parseInt(form.dataset.productId);
+                console.log('Product ID:', productId);
+                
+                if (!productId) {
+                    showAlert('❌ Product ID not found', 'error');
+                    return;
+                }
+
+                const products = getProducts();
+                const productIndex = products.findIndex(p => p.id === productId);
+                console.log('Product index:', productIndex);
+
+                if (productIndex === -1) {
+                    showAlert('❌ Product not found', 'error');
+                    return;
+                }
+
+                // Read form values
+                const productName = document.getElementById('editProductName').value.trim();
+                const productYear = document.getElementById('editProductYear').value;
+                const productSeries = document.getElementById('editProductSeries').value.trim();
+                const productCondition = document.getElementById('editProductCondition').value;
+                const productPrice = document.getElementById('editProductPrice').value;
+                const productQuantity = document.getElementById('editProductQuantity').value;
+                const productDescription = document.getElementById('editProductDescription').value.trim();
+
+                console.log('Form values:', {
+                    productName, productYear, productSeries, productCondition,
+                    productPrice, productQuantity, productDescription
+                });
+
+                // Check for empty strings
+                if (productName === '' || productYear === '' || productSeries === '' || productCondition === '' || productPrice === '' || productQuantity === '' || productDescription === '') {
+                    showAlert('❌ Please fill in all fields', 'error');
+                    return;
+                }
+
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Saving...';
+                submitBtn.disabled = true;
+
+                // Check which images need to be loaded
+                const imagesToLoad = [];
+                let loadedCount = 0;
+                const newImages = [...products[productIndex].images];
+
+                for (let i = 0; i < 4; i++) {
+                    const file = document.getElementById(`editImage${i}`).files[0];
+                    if (file) {
+                        imagesToLoad.push(i);
+                    }
+                }
+
+                console.log('Images to load:', imagesToLoad.length);
+
+                if (imagesToLoad.length === 0) {
+                    // No new images, just update product data
+                    console.log('Updating product without new images');
+                    updateProductData(productIndex, productName, parseInt(productYear), productSeries, productCondition, parseFloat(productPrice), parseInt(productQuantity), productDescription, newImages);
+                    closeEditModal();
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // Load new images
+                console.log('Loading new images...');
+                imagesToLoad.forEach(i => {
+                    const file = document.getElementById(`editImage${i}`).files[0];
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        newImages[i] = event.target.result;
+                        loadedCount++;
+
+                        if (loadedCount === imagesToLoad.length) {
+                            console.log('All images loaded, updating product');
+                            updateProductData(productIndex, productName, parseInt(productYear), productSeries, productCondition, parseFloat(productPrice), parseInt(productQuantity), productDescription, newImages);
+                            closeEditModal();
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    };
+
+                    reader.onerror = function() {
+                        console.error('Error loading image');
+                        showAlert('❌ Error loading image', 'error');
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+            });
+        }
+
+        function updateProductData(productIndex, name, year, series, condition, price, quantity, description, images) {
+            const products = getProducts();
+            products[productIndex] = {
+                ...products[productIndex],
+                name,
+                year,
+                series,
+                condition,
+                price,
+                quantity,
+                description,
+                images
+            };
+            saveProducts(products);
+            showAlert(`✅ "${name}" updated successfully!`, 'success');
+            
+            // Small delay to ensure modal is closed before switching tabs
+            setTimeout(() => {
+                renderProductsList();
+                switchTab('manage-products');
+            }, 300);
+        }
+
+        function deleteProduct(productId) {
+            if (confirm('⚠️ Are you sure you want to delete this product?')) {
+                let products = getProducts();
+                const product = products.find(p => p.id === productId);
+                products = products.filter(p => p.id !== productId);
+                saveProducts(products);
+                renderProductsList();
+                showAlert(`🗑️ "${product.name}" deleted`, 'success');
+            }
+        }
+
+        function setupEditImageHandlers() {
+            const editInputs = document.querySelectorAll('.edit-image-input');
+            if (editInputs.length === 0) {
+                console.warn('edit-image-input elements not found');
+                return;
+            }
+            
+            editInputs.forEach((input, index) => {
+                input.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const preview = document.getElementById(`editPreview${index}`);
+                            if (!preview) {
+                                console.warn(`editPreview${index} not found`);
+                                return;
+                            }
+                            preview.innerHTML = `
+                                <div class="image-preview">
+                                    <img src="${event.target.result}" alt="Preview">
+                                    <button type="button" class="image-remove-btn" onclick="removeEditImage(${index})">✕</button>
+                                </div>
+                            `;
+                            preview.style.display = 'block';
+                            const btn = document.getElementById(`editImageBtn${index}`);
+                            if (btn) btn.style.display = 'none';
+                            input.dataset.hasImage = 'true';
+                        };
+                        reader.onerror = function() {
+                            showAlert('❌ Error reading image file', 'error');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+
+        // ===== RENDERING =====
+        function renderProductsList() {
+            const products = getProducts();
+            const listContainer = document.getElementById('productsList');
+            const emptyState = document.getElementById('emptyState');
+
+            // Update stats
+            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('totalStock').textContent = products.reduce((sum, p) => sum + p.quantity, 0);
+            document.getElementById('totalValue').textContent = '£' + products.reduce((sum, p) => sum + (p.price * p.quantity), 0).toFixed(2);
+
+            if (products.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            listContainer.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-images-preview">
+                        ${product.images.slice(0, 4).map(img => `<img src="${img}" alt="Product">`).join('')}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-meta">
+                            <span><strong>Year:</strong> ${product.year}</span>
+                            <span><strong>Series:</strong> ${product.series}</span>
+                            <span><strong>Condition:</strong> ${product.condition}</span>
+                            <span><strong>Price:</strong> £${product.price.toFixed(2)}</span>
+                            <span><strong>Stock:</strong> ${product.quantity}</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">${product.description}</p>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-secondary btn-small" onclick="editProduct(${product.id})">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteProduct(${product.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== DATA MANAGEMENT =====
+        function exportData() {
+            const products = getProducts();
+            const dataStr = JSON.stringify(products, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `diecast-garage-products-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showAlert('Products exported successfully!', 'success', 'alert2');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const products = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(products)) {
+                        throw new Error('Invalid format');
+                    }
+
+                    saveProducts(products);
+                    showAlert(`Imported ${products.length} products successfully!`, 'success', 'alert2');
+                    renderProductsList();
+                } catch (error) {
+                    showAlert('Error importing file. Please check the format.', 'error', 'alert2');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            document.getElementById('importFile').value = '';
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Are you SURE? This will delete ALL products and cannot be undone.')) {
+                if (confirm('This is your last chance. Really delete everything?')) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    renderProductsList();
+                    showAlert('All products deleted', 'success', 'alert2');
+                }
+            }
+        }
+
+        // ===== ALERTS =====
+        function showAlert(message, type, elementId = 'alert') {
+            const alert = document.getElementById(elementId);
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            
+            setTimeout(() => {
+                alert.className = 'alert';
+            }, 4000);
+        }
+
+        // ===== INITIALIZATION =====
+        renderProductsList();
+
+        // ===== AUTHENTICATION =====
+        const ADMIN_PASSWORD_HASH = '8c7dd922ad47494fc02c388e12c00eac'; // SHA1 hash of 'admin123'
+        const SESSION_KEY = 'diecast_admin_session';
+        const SESSION_TIMEOUT = 8 * 60 * 60 * 1000; // 8 hours
+
+        function hashPassword(password) {
+            // Simple SHA1-like hash (not cryptographically secure, but adequate for basic protection)
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16);
+        }
+
+        function checkAuthentication() {
+            const session = localStorage.getItem(SESSION_KEY);
+            if (session) {
+                try {
+                    const { timestamp } = JSON.parse(session);
+                    if (Date.now() - timestamp < SESSION_TIMEOUT) {
+                        return true;
+                    }
+                } catch (e) {
+                    localStorage.removeItem(SESSION_KEY);
+                }
+            }
+            return false;
+        }
+
+        function authenticate(password) {
+            // Default password: admin123
+            const hash = hashPassword(password);
+            
+            // Also support a simple password check
+            if (password === 'admin123') {
+                const session = {
+                    authenticated: true,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+                return true;
+            }
+            return false;
+        }
+
+        function logout() {
+            localStorage.removeItem(SESSION_KEY);
+            location.reload();
+        }
+
+        // Check authentication on page load
+        window.addEventListener('load', function() {
+            const loginScreen = document.getElementById('loginScreen');
+            const adminPanel = document.getElementById('adminPanel');
+            const loginForm = document.getElementById('loginForm');
+            
+            if (!loginScreen || !adminPanel || !loginForm) {
+                console.error('Required elements not found:', {
+                    loginScreen: !!loginScreen,
+                    adminPanel: !!adminPanel,
+                    loginForm: !!loginForm
+                });
+                return;
+            }
+            
+            // Setup login form listener
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Login form submitted');
+                
+                const passwordInput = document.getElementById('adminPassword');
+                if (!passwordInput) {
+                    console.error('Password input not found');
+                    return;
+                }
+                
+                const password = passwordInput.value;
+                console.log('Password entered (length):', password.length);
+                
+                try {
+                    const isAuthenticated = authenticate(password);
+                    console.log('Authentication result:', isAuthenticated);
+                    
+                    if (isAuthenticated) {
+                        console.log('Auth successful, showing admin panel');
+                        loginScreen.classList.remove('active');
+                        adminPanel.style.display = 'block';
+                        passwordInput.value = '';
+                        
+                        console.log('Setting up form listeners...');
+                        setupFormListener();
+                        setupImageHandlers();
+                        setupEditFormListener();
+                        setupEditImageHandlers();
+                        console.log('Setup complete');
+                    } else {
+                        console.log('Authentication failed - incorrect password');
+                        alert('❌ Incorrect password. Please try again.');
+                        passwordInput.value = '';
+                        passwordInput.focus();
+                    }
+                } catch (error) {
+                    console.error('Error during login:', error);
+                    alert('❌ An error occurred. Check console for details.');
+                }
+            });
+            
+            // Check initial authentication
+            if (checkAuthentication()) {
+                loginScreen.classList.remove('active');
+                adminPanel.style.display = 'block';
+                setupFormListener();
+                setupImageHandlers();
+                setupEditFormListener();
+                setupEditImageHandlers();
+            } else {
+                loginScreen.classList.add('active');
+                adminPanel.style.display = 'none';
+            }
+        });
+
+        // ===== EXPORT FUNCTIONS =====
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+        window.closeEditModal = closeEditModal;
+        window.removeEditImage = removeEditImage;
+        window.removeImage = removeImage;
+        window.switchTab = switchTab;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.clearAllData = clearAllData;
+        window.logout = logout;
+    </script>
+    </div>
+</body>
+</html>

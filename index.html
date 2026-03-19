@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diecast Garage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🏎️ DIECAST GARAGE</h1>
+                <p class="tagline">Premium Collector Series</p>
+            </div>
+            <nav class="nav-controls">
+                <a href="admin.html" class="admin-link" title="Admin Panel">⚙️</a>
+                <button class="cart-btn" id="cartBtn">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Filter & Search -->
+    <section class="controls-section">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by model name...">
+        </div>
+        <div class="filter-controls">
+            <select id="filterCondition">
+                <option value="">All Conditions</option>
+                <option value="mint">Mint in Box (MIB)</option>
+                <option value="excellent">Excellent</option>
+                <option value="good">Good</option>
+            </select>
+            <select id="filterSort">
+                <option value="featured">Featured</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <main class="products-container">
+        <div class="products-grid" id="productsGrid">
+            <!-- Products populated by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Product Detail Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <div class="modal-body">
+                <div class="modal-image-gallery">
+                    <div class="image-display">
+                        <img id="modalMainImage" src="" alt="Product image" class="modal-main-img">
+                        <div class="image-nav">
+                            <button class="nav-btn prev-btn" id="prevImageBtn">❮</button>
+                            <button class="nav-btn next-btn" id="nextImageBtn">❯</button>
+                        </div>
+                        <div class="image-counter" id="imageCounter">1/4</div>
+                    </div>
+                    <div class="thumbnail-gallery">
+                        <div id="thumbnailContainer" class="thumbnails">
+                            <!-- Thumbnails populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-info">
+                    <h2 id="modalTitle"></h2>
+                    <p class="modal-condition" id="modalCondition"></p>
+                    <p class="modal-description" id="modalDescription"></p>
+                    
+                    <div class="modal-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Year:</span>
+                            <span id="modalYear"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Series:</span>
+                            <span id="modalSeries"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Quantity Available:</span>
+                            <span id="modalQty"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-pricing">
+                        <div class="price-tag">
+                            <span class="price-label">Price</span>
+                            <span class="price-value" id="modalPrice"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <div class="quantity-selector">
+                            <button class="qty-btn" id="decreaseQty">−</button>
+                            <input type="number" id="quantityInput" value="1" min="1">
+                            <button class="qty-btn" id="increaseQty">+</button>
+                        </div>
+                        <button class="add-cart-btn" id="addToCartBtn">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Sidebar -->
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="cart-close" id="closeCart">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items populated by JavaScript -->
+        </div>
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="subtotal">$0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping:</span>
+                <span id="shipping">$0.00</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total:</span>
+                <span id="total">$0.00</span>
+            </div>
+        </div>
+        <div class="cart-actions">
+            <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+            <button class="continue-shopping" id="continueShopping">Continue Shopping</button>
+        </div>
+    </aside>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content checkout-modal">
+            <button class="modal-close" id="closeCheckout">&times;</button>
+            <h2>Checkout</h2>
+            
+            <form id="checkoutForm" class="checkout-form">
+                <fieldset>
+                    <legend>Shipping Information</legend>
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Street Address *</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    <div class="form-group form-row">
+                        <div>
+                            <label for="city">City/Town *</label>
+                            <input type="text" id="city" required>
+                        </div>
+                        <div>
+                            <label for="state">County/Region *</label>
+                            <input type="text" id="state" required>
+                        </div>
+                        <div>
+                            <label for="zip">Postcode *</label>
+                            <input type="text" id="zip" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country *</label>
+                        <input type="text" id="country" value="United Kingdom" required>
+                    </div>
+                </fieldset>
+
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div id="checkoutSummary"></div>
+                </div>
+
+                <div class="payment-section">
+                    <h3>Payment Method</h3>
+                    <div id="paypalButtonContainer"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Empty Cart Message -->
+    <div class="empty-state" id="emptyCart" style="display: none;">
+        <p>Your cart is empty</p>
+    </div>
+
+    <!-- Return to Top Button -->
+    <button class="return-to-top" id="returnToTop" title="Back to top">▲</button>
+
+    <!-- Overlay for modals -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- PayPal SDK -->
+    <!-- Replace YOUR_PAYPAL_CLIENT_ID with your actual Client ID from PayPal Developer Dashboard -->
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=GBP"></script>
+    
+    <!-- Main Application Script -->
+    <script src="script.js"></script>
+</body>
+</html>
